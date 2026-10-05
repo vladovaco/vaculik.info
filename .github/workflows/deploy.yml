@@ -1,0 +1,66 @@
+# Deploys the main branch to Websupport over SSH.
+#
+# Required repository secrets:
+#   WS_SSH_HOST     e.g. ssh.websupport.sk (or the host from the hosting panel)
+#   WS_SSH_PORT     usually 22
+#   WS_SSH_USER     hosting SSH user
+#   WS_SSH_KEY      private key whose public half is in the hosting's authorized_keys
+#   WS_DEPLOY_PATH  absolute path of the application root on the server
+#                   (the web root must point to <WS_DEPLOY_PATH>/public)
+#
+# The server keeps its own .env (never committed) and writable/ contents.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, mbstring, gd
+          coverage: none
+
+      - name: Install PHP dependencies (production)
+        run: composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build assets
+        run: npm ci && npm run build
+
+      - name: Prepare SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.WS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.WS_SSH_PORT }}" "${{ secrets.WS_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Sync files
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.WS_SSH_PORT }}" \
+            --exclude '.git' --exclude '.github' --exclude 'node_modules' --exclude 'tests' \
+            --exclude '.env' --exclude 'writable/' --exclude 'resources' --exclude 'scripts' \
+            --exclude 'package*.json' --exclude 'tailwind.config.js' --exclude 'phpunit*.xml' \
+            ./ "${{ secrets.WS_SSH_USER }}@${{ secrets.WS_SSH_HOST }}:${{ secrets.WS_DEPLOY_PATH }}/"
+
+      - name: Migrate and warm up
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.WS_SSH_PORT }}" "${{ secrets.WS_SSH_USER }}@${{ secrets.WS_SSH_HOST }}" \
+            "cd '${{ secrets.WS_DEPLOY_PATH }}' && php spark migrate --all --no-interaction && php spark cache:clear && php spark optimize"
