@@ -27,6 +27,9 @@ jobs:
       - name: Build assets
         run: npm ci && npm run build
 
+      - name: Built assets must be committed (server does not run npm)
+        run: git diff --exit-code -- public/assets
+
       - name: Validate composer.json
         run: composer validate --strict
 

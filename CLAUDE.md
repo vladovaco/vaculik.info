@@ -5,7 +5,7 @@ Rodinný informačný systém. Návrh: `docs/ARCHITEKTURA.md`. Vývoj a nasadeni
 ## Stack
 - PHP 8.2+, CodeIgniter 4.7, Shield (auth), Settings, MySQL 8 (produkcia) / SQLite (lokálne a testy)
 - Server-rendered views + HTMX + Alpine.js + Tailwind 3; PWA (manifest + service worker). Žiadny SPA framework.
-- Nasadenie: Websupport cez `.github/workflows/deploy.yml`.
+- Nasadenie: pull-based na Websupporte, na serveri `php spark app:deploy` (ručne z konzoly alebo cez cron). GitHub Actions len testujú.
 
 ## Konvencie
 - Kód a komentáre v angličtine, UI texty a dokumentácia v slovenčine (s diakritikou). URL segmenty po slovensky (`/osoby`, `/kalendar`).

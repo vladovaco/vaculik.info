@@ -3,7 +3,7 @@
 Rodinný informačný systém – kalendár, škola, platby, dokumenty, zdravie, domácnosť a asistent na jednom mieste. Mobile first PWA.
 
 - Stack: PHP 8.2+ · CodeIgniter 4 · Shield · MySQL 8 · HTMX + Alpine.js + Tailwind
-- Hosting: Websupport (deploy cez GitHub Actions)
+- Hosting: Websupport (pull-based deploy príkazom `php spark app:deploy`)
 
 | Dokument | Obsah |
 |---|---|
@@ -13,7 +13,7 @@ Rodinný informačný systém – kalendár, škola, platby, dokumenty, zdravie,
 
 ## Stav
 
-- [x] Fáza 0 – základ: CI4 + Shield, roly, modulová štruktúra, mobilný shell, PWA, Osoby, „Dnes“, CI + deploy
+- [x] Fáza 0 – základ: CI4 + Shield, roly, modulová štruktúra, mobilný shell, PWA, Osoby, „Dnes“, CI, deploy príkaz
 - [ ] Fáza 1 – denný chod: Kalendár, Termíny, Platby + PAY by square, Dokumenty + kartičky, Kontakty, Notifikácie
 - [ ] Fáza 2 – škola a zdravie
 - [ ] Fáza 3 – asistent a domácnosť

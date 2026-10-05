@@ -56,12 +56,60 @@ resources/css/app.css      zdroj Tailwindu (komponentové triedy .card, .btn-pri
 
 ## Nasadenie na Websupport
 
-Workflow `.github/workflows/deploy.yml` pri pushi do `main`:
+Nasadenie je **pull-based**: server si sám stiahne commity z GitHubu. Nepotrebuje trvalé SSH ani GitHub secrets. Prvá inštalácia sa robí raz cez dočasnú webovú konzolu Websupportu, každá ďalšia aktualizácia je jeden príkaz, ktorý môže spúšťať aj cron.
 
-1. `composer install --no-dev`, `npm run build`
-2. `rsync` do `WS_DEPLOY_PATH` (vynecháva `.env`, `writable/`, `node_modules`, testy)
-3. `php spark migrate --all` cez SSH
+### Prvá inštalácia (raz, cez konzolu)
 
-Na serveri raz ručne: vytvoriť `.env` z `.env.example` (MySQL údaje z panela, `encryption.key`, SMTP), nasmerovať web root na `public/`, nastaviť práva na `writable/`, spustiť `php spark app:install`. Cron (fáza 1): `*/5 * * * * php <WS_DEPLOY_PATH>/spark app:tick`.
+1. V administrácii Websupportu aktivujte konzolu (Shell) pre doménu a prihláste sa.
+2. Overte nástroje. Potrebný je `git` a PHP 8.2+. Composer nie je nutný, `app:deploy` si stiahne `composer.phar`, ak chýba.
+   ```bash
+   which git php composer; php -v
+   ```
+3. Naklonujte repozitár vedľa dnešného web rootu domény (nie doň). Ak je web root napr. `/.../vaculik.info/web`, aplikácia pôjde do `/.../vaculik.info/app`.
+   ```bash
+   cd /.../vaculik.info
+   git clone --branch main https://github.com/vladovaco/vaculik.info.git app
+   cd app
+   ```
+   Pre privátny repozitár použite GitHub token s právom len na čítanie (Settings → Developer settings → Fine-grained token, Contents: Read) v URL: `https://<token>@github.com/vladovaco/vaculik.info.git`. Git si ho uloží do `.git/config`, ktorý je mimo web rootu.
+4. Vytvorte `.env` z `.env.example`: MySQL údaje z administrácie, `CI_ENVIRONMENT = production`, `app.baseURL = 'https://vaculik.info/'`, `encryption.key` (vygenerujte `php spark key:generate --show`), SMTP.
+5. Prvé nasadenie, migrácie a admin účet:
+   ```bash
+   php spark app:deploy --force
+   php spark app:install
+   ```
+6. V administrácii Websupportu zmeňte adresár domény (document root) na `/.../vaculik.info/app/public`. Verejný je len tento priečinok, zvyšok aplikácie (vrátane `.env` a `writable/`) zostáva mimo webu.
+7. Overte `https://vaculik.info/up` (JSON so stavom `ok`) a prihlásenie.
 
-Potrebné GitHub secrets: `WS_SSH_HOST`, `WS_SSH_PORT`, `WS_SSH_USER`, `WS_SSH_KEY`, `WS_DEPLOY_PATH`.
+### Aktualizácia
+
+Po pushi do `main` spustite v konzole:
+
+```bash
+cd /.../vaculik.info/app && php spark app:deploy
+```
+
+Príkaz stiahne nové commity (`git pull --ff-only`), spustí `composer install --no-dev`, migrácie a vyčistí cache. Ak nie sú nové commity, nič nerobí. Zámok v `writable/deploy.lock` bráni súbežným behom.
+
+### Automaticky cez cron (voliteľné)
+
+V administrácii Websupportu pridajte cron, ktorý beží každých 5 až 15 minút:
+
+```
+*/10 * * * * cd /.../vaculik.info/app && php spark app:deploy >> writable/logs/deploy.log 2>&1
+```
+
+Push do `main` sa potom prejaví do niekoľkých minút bez ďalšieho zásahu. Ak cron Websupportu nepovoľuje shell príkaz, ale len PHP skript, nastavte ako skript `/.../vaculik.info/app/spark` s argumentom `app:deploy`.
+
+### Čo sa necommituje a kde to na serveri je
+
+| Čo | Kde | Poznámka |
+|---|---|---|
+| `.env` | koreň aplikácie | vytvoriť ručne, nikdy do gitu |
+| `vendor/` | koreň aplikácie | vytvára `app:deploy` cez composer |
+| `writable/` | koreň aplikácie | logy, cache, uploady, `deploy.lock`; práva na zápis pre PHP |
+| `public/assets/app.css` | v gite | server nespúšťa npm, build CSS sa commituje (CI to kontroluje) |
+
+### CI na GitHube
+
+`.github/workflows/ci.yml` pri každom pushi spustí testy a overí, že `public/assets/app.css` zodpovedá zdrojom v `resources/css`.
