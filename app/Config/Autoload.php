@@ -43,6 +43,12 @@ class Autoload extends AutoloadConfig
         'Modules\\Auth'      => APPPATH . 'Modules/Auth',
         'Modules\\Household' => APPPATH . 'Modules/Household',
         'Modules\\Dashboard' => APPPATH . 'Modules/Dashboard',
+        'Modules\\Contacts'      => APPPATH . 'Modules/Contacts',
+        'Modules\\Documents'     => APPPATH . 'Modules/Documents',
+        'Modules\\Finance'       => APPPATH . 'Modules/Finance',
+        'Modules\\Calendar'      => APPPATH . 'Modules/Calendar',
+        'Modules\\Deadlines'     => APPPATH . 'Modules/Deadlines',
+        'Modules\\Notifications' => APPPATH . 'Modules/Notifications',
     ];
 
     /**

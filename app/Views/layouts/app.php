@@ -9,6 +9,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title><?= isset($title) ? esc($title) . ' · ' : '' ?>vaculik.info</title>
     <link rel="manifest" href="<?= base_url('manifest.webmanifest') ?>">
+    <meta name="vapid-public-key" content="<?= esc(config('Push')->vapidPublicKey, 'attr') ?>">
+    <meta name="push-subscribe-url" content="<?= url_to('push.subscribe') ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <link rel="icon" href="<?= base_url('assets/icons/icon.svg') ?>" type="image/svg+xml">
     <link rel="apple-touch-icon" href="<?= base_url('assets/icons/icon-192.png') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/app.css') ?>?v=<?= filemtime(FCPATH . 'assets/app.css') ?>">
@@ -17,7 +21,7 @@
     <?= $this->renderSection('head') ?>
 </head>
 <body class="h-full bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100" hx-boost="true">
-<?php $user = auth()->user(); $nav = config('Family')->bottomNav; $current = service('router')->getMatchedRoute()[0] ?? ''; ?>
+<?php $user = auth()->user(); $nav = config('Family')->bottomNav; $current = service('router')->getMatchedRoute()[0] ?? ''; $unread = $user ? model(\Modules\Notifications\Models\NotificationModel::class)->unreadCount($user->id) : 0; ?>
 
 <div class="min-h-full flex flex-col">
     <header class="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 safe-top">
@@ -25,7 +29,10 @@
             <a href="<?= url_to('dashboard') ?>" class="font-semibold tracking-tight">vaculik<span class="text-blue-600">.info</span></a>
             <div class="flex items-center gap-1">
                 <?php if (session('message')): ?><span class="sr-only"><?= esc(session('message')) ?></span><?php endif ?>
-                <a href="#" class="icon-btn" aria-label="Notifikácie"><?= nav_icon('bell') ?></a>
+                <a href="<?= url_to('notifications') ?>" class="icon-btn relative" aria-label="Upozornenia<?= $unread ? ' (' . $unread . ' neprečítaných)' : '' ?>">
+                    <?= nav_icon('bell') ?>
+                    <?php if ($unread > 0): ?><span class="absolute top-1 right-1 badge badge-danger h-5 min-w-[1.25rem] px-1 text-[10px]"><?= $unread > 99 ? '99+' : $unread ?></span><?php endif ?>
+                </a>
                 <a href="<?= url_to('more') ?>" class="avatar h-8 w-8 text-xs" style="background: <?= esc(service('householdContext')->person()?->color ?? '#64748b', 'attr') ?>">
                     <?= esc(service('householdContext')->person()?->initials() ?? mb_strtoupper(mb_substr((string) ($user?->email ?? '?'), 0, 1))) ?>
                 </a>
@@ -71,6 +78,7 @@
         window.addEventListener('load', () => navigator.serviceWorker.register('<?= base_url('sw.js') ?>'));
     }
 </script>
+<script src="<?= base_url('assets/push.js') ?>" defer></script>
 <?= $this->renderSection('scripts') ?>
 </body>
 </html>

@@ -7,7 +7,7 @@ namespace App\Commands;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use CodeIgniter\Shield\Entities\User;
-use CodeIgniter\Shield\Models\UserModel;
+use App\Models\UserModel;
 use Modules\Household\Entities\Person;
 use Modules\Household\Models\HouseholdModel;
 use Modules\Household\Models\PersonModel;

@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use Modules\Core\Services\DeadlineAggregator;
 use Modules\Core\Services\HouseholdContext;
 
 /**
@@ -27,5 +28,14 @@ class Services extends BaseService
         }
 
         return new HouseholdContext();
+    }
+
+    public static function deadlines(bool $getShared = true): DeadlineAggregator
+    {
+        if ($getShared) {
+            return static::getSharedInstance('deadlines');
+        }
+
+        return new DeadlineAggregator();
     }
 }

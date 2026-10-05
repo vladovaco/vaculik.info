@@ -132,3 +132,4 @@ node_modules/
 /writable/*.sqlite
 /writable/deploy.lock
 /composer.phar
+/writable/tick.lock

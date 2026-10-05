@@ -34,3 +34,17 @@
   .safe-top { padding-top: env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }
+
+@layer components {
+  .chip { @apply inline-flex items-center whitespace-nowrap rounded-full border border-slate-300 dark:border-slate-600 px-3 min-h-[36px] text-sm font-medium text-slate-700 dark:text-slate-200; }
+  .chip-active { @apply border-blue-600 bg-blue-600 text-white; }
+  .badge { @apply inline-flex items-center justify-center rounded-full px-2 min-w-[1.5rem] h-6 text-xs font-semibold; }
+  .badge-danger { @apply bg-red-600 text-white; }
+  .badge-warning { @apply bg-amber-500 text-white; }
+  .badge-ok { @apply bg-emerald-600 text-white; }
+  .badge-muted { @apply bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200; }
+  .tabs { @apply flex gap-1 rounded-xl bg-slate-200 dark:bg-slate-800 p-1 mb-4; }
+  .tab { @apply flex-1 text-center rounded-lg min-h-[40px] inline-flex items-center justify-center text-sm font-medium text-slate-600 dark:text-slate-300; }
+  .tab-active { @apply bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm; }
+  .day-heading { @apply sticky top-14 z-10 -mx-4 px-4 py-1 bg-slate-50/95 dark:bg-slate-900/95 text-xs font-semibold uppercase tracking-wide text-slate-500; }
+}

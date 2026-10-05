@@ -42,9 +42,4 @@ class DashboardController extends BaseController
     {
         return view('Modules\Dashboard\Views\more', ['title' => 'Viac']);
     }
-
-    public function comingSoon(string $name): string
-    {
-        return view('Modules\Dashboard\Views\coming_soon', ['title' => urldecode($name)]);
-    }
 }

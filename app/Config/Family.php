@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
+use Modules\Calendar\Dashboard\CalendarCards;
+use Modules\Documents\Dashboard\DocumentCards;
+use Modules\Documents\Deadlines\DocumentDeadlines;
+use Modules\Finance\Dashboard\FinanceCards;
+use Modules\Finance\Deadlines\PaymentDeadlines;
 use Modules\Household\Dashboard\HouseholdCards;
 
 /**
@@ -19,6 +24,9 @@ class Family extends BaseConfig
      * @var list<class-string<\Modules\Core\Contracts\DashboardCardProvider>>
      */
     public array $dashboardProviders = [
+        FinanceCards::class,
+        CalendarCards::class,
+        DocumentCards::class,
         HouseholdCards::class,
     ];
 
@@ -27,7 +35,10 @@ class Family extends BaseConfig
      *
      * @var list<class-string<\Modules\Core\Contracts\DeadlineProvider>>
      */
-    public array $deadlineProviders = [];
+    public array $deadlineProviders = [
+        PaymentDeadlines::class,
+        DocumentDeadlines::class,
+    ];
 
     /**
      * Classes implementing Modules\Core\Contracts\AssistantToolProvider.
@@ -48,4 +59,16 @@ class Family extends BaseConfig
         ['route' => 'documents', 'label' => 'Dokumenty', 'icon' => 'document'],
         ['route' => 'more', 'label' => 'Viac', 'icon' => 'grid'],
     ];
+
+    /**
+     * Days before a deadline on which a reminder notification is sent (0 = on the day).
+     *
+     * @var list<int>
+     */
+    public array $reminderOffsets = [7, 1, 0];
+
+    /**
+     * Hour (household timezone) after which the daily "Dnes" digest is sent.
+     */
+    public int $digestHour = 7;
 }

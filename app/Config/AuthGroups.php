@@ -59,22 +59,23 @@ class AuthGroups extends ShieldAuthGroups
         'tasks.manage'      => 'Zadávanie a schvaľovanie úloh',
         'tasks.own'         => 'Vlastné úlohy, rutiny a odmeny',
         'assistant.use'     => 'Chat s asistentom',
+        'deadlines.view'    => 'Zobrazenie termínov',
     ];
 
     public array $matrix = [
         'admin' => [
             'users.*', 'settings.*', 'household.*', 'calendar.*', 'finance.*',
-            'documents.*', 'contacts.*', 'school.*', 'health.*', 'tasks.*', 'assistant.*',
+            'documents.*', 'contacts.*', 'school.*', 'health.*', 'tasks.*', 'assistant.*', 'deadlines.*',
         ],
         'adult' => [
             'household.*', 'calendar.*', 'finance.*', 'documents.*', 'contacts.*',
-            'school.*', 'health.*', 'tasks.*', 'assistant.*',
+            'school.*', 'health.*', 'tasks.*', 'assistant.*', 'deadlines.*',
         ],
         'child' => [
-            'calendar.view', 'school.view', 'tasks.own',
+            'calendar.view', 'school.view', 'tasks.own', 'deadlines.view',
         ],
         'guest' => [
-            'household.view', 'calendar.view', 'contacts.view', 'health.view',
+            'household.view', 'calendar.view', 'contacts.view', 'health.view', 'deadlines.view',
         ],
     ];
 }

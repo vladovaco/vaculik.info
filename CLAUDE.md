@@ -12,7 +12,9 @@ Rodinný informačný systém. Návrh: `docs/ARCHITEKTURA.md`. Vývoj a nasadeni
 - Každá doména je modul v `app/Modules/<Name>` s vlastným PSR-4 namespace v `app/Config/Autoload.php`. Routes modulu sa auto-discoverujú.
 - Oprávnenia `<modul>.view` / `<modul>.manage` v `app/Config/AuthGroups.php`; routy chrániť filtrom `permission:`.
 - Každá tabuľka má `household_id`, modely používajú `useTimestamps`, entity namiesto polí. Soft delete tam, kde ide o dáta rodiny.
-- Dashboard karty cez `Modules\Core\Contracts\DashboardCardProvider` + registrácia v `app/Config/Family.php`.
+- Dashboard karty cez `Modules\Core\Contracts\DashboardCardProvider`, termíny cez `DeadlineProvider`; oboje registrovať v `app/Config/Family.php`.
+- Upozornenia len cez `Modules\Notifications\Services\Notifier::notify()` s dedupe kľúčom; nikdy neposielať push/e-mail priamo.
+- Testy dedia z `Tests\Support\FamilyTestCase` (`loginAs()`, `makePerson()`, `csrf()`).
 - Mobile first: touch ciele min. 44 px, komponentové triedy v `resources/css/app.css`, po zmene CSS spustiť `npm run build` a commitnúť `public/assets/app.css`.
 - Citlivé polia (rodné číslo, IBAN, čísla kartičiek) šifrovať cez CI4 `Encryption`; súbory mimo `public/`.
 
